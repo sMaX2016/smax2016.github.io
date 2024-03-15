@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Input to Sentence with Timer</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+    }
+    #container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        text-align: center;
+    }
+    #timerDot {
+        width: 308px;
+        height: 308px;
+        background-color: #000;
+        border-radius: 50%;
+        margin: 0 auto 20px; /* Center horizontally and add space below */
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    #timerDot.clicked {
+        background-color: #ff0;
+    }
+    #inputSentence {
+        width: 205px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+    #outputSentences {
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+    }
+    .outputSentence {
+        color: #777;
+        margin-bottom: 10px;
+    }
+</style>
+</head>
+<body>
+<div id="container">
+    <div id="timerDot" onclick="startTimer()"></div>
+    <input type="text" id="inputSentence" placeholder="Type your sentence here and press Enter">
+    <div id="outputSentences"></div>
+</div>
+
+<script>
+    function startTimer() {
+        document.getElementById("timerDot").classList.add("clicked");
+    }
+
+    const inputSentence = document.getElementById('inputSentence');
+    const outputSentences = document.getElementById('outputSentences');
+
+    inputSentence.addEventListener('keyup', function(event) {
+        if (event.keyCode === 13) {
+            const sentence = inputSentence.value;
+            const newDiv = document.createElement('div');
+            newDiv.classList.add('outputSentence');
+            newDiv.textContent = sentence;
+            outputSentences.prepend(newDiv);
+            inputSentence.value = '';
+        }
+    });
+</script>
+</body>
+</html>
