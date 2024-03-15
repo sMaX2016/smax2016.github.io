@@ -25,7 +25,15 @@
         margin: 0 auto 20px; /* Center horizontally and add space below */
         cursor: pointer;
         transition: background-color 0.3s ease;
+        animation: shrinkTimer 300s linear forwards;
     }
+     @keyframes shrinkTimer {
+        to {
+            width: 0;
+            height: 0;
+            opacity: 0;
+        }
+    }    
     #timerDot.clicked {
         background-color: #ff0;
     }
