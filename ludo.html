@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ludo Board with Random Dot</title>
+    <title>Classic Ludo Board</title>
     <style>
         body {
             display: flex;
@@ -11,83 +11,107 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            overflow: hidden;
-            background-color: #f0f0f0;
+            background-color: #f5f5f5;
             font-family: Arial, sans-serif;
+            overflow: hidden;
         }
 
-        .ludo-board {
-            width: 500px;
-            height: 500px;
+        .ludo-container {
+            width: 600px;
+            height: 600px;
+            position: relative;
+            background-color: #f0d9b5;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .board {
+            width: 100%;
+            height: 100%;
+            position: relative;
             display: grid;
             grid-template-columns: repeat(15, 1fr);
             grid-template-rows: repeat(15, 1fr);
-            border: 2px solid #333;
-            position: relative;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
         }
 
         .cell {
-            border: 1px solid #ddd;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             position: relative;
+            border: 1px solid #d4a76a;
+            box-sizing: border-box;
         }
 
         /* Center square */
         .center {
-            background-color: #f9f9f9;
+            background-color: #f0d9b5;
             grid-column: 6 / span 4;
             grid-row: 6 / span 4;
         }
 
         /* Home paths */
-        .home-path {
-            background-color: #f0f0f0;
+        .red-path { background-color: #ffcccc; }
+        .blue-path { background-color: #ccccff; }
+        .green-path { background-color: #ccffcc; }
+        .yellow-path { background-color: #ffffcc; }
+
+        /* Start positions */
+        .red-start { background-color: #ff6666; }
+        .blue-start { background-color: #6666ff; }
+        .green-start { background-color: #66ff66; }
+        .yellow-start { background-color: #ffff66; }
+
+        /* Safe zones */
+        .safe-zone {
+            position: relative;
+        }
+
+        .safe-zone::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 2;
         }
 
         /* Player paths */
-        .red-path {
-            background-color: #ffcccc;
-        }
-        .blue-path {
-            background-color: #ccccff;
-        }
-        .green-path {
-            background-color: #ccffcc;
-        }
-        .yellow-path {
-            background-color: #ffffcc;
-        }
+        .path-red { background-color: #ffcccc; }
+        .path-blue { background-color: #ccccff; }
+        .path-green { background-color: #ccffcc; }
+        .path-yellow { background-color: #ffffcc; }
 
         /* Start positions */
-        .red-start {
-            background-color: #ff6666;
-        }
-        .blue-start {
-            background-color: #6666ff;
-        }
-        .green-start {
-            background-color: #66ff66;
-        }
-        .yellow-start {
-            background-color: #ffff66;
-        }
+        .start-red { background-color: #ff6666; }
+        .start-blue { background-color: #6666ff; }
+        .start-green { background-color: #66ff66; }
+        .start-yellow { background-color: #ffff66; }
+
+        /* Finish paths */
+        .finish-red { background-color: #ff9999; }
+        .finish-blue { background-color: #9999ff; }
+        .finish-green { background-color: #99ff99; }
+        .finish-yellow { background-color: #ffff99; }
 
         /* Fixed positions (10-13) */
         .fixed-position {
             position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: #000;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
         }
 
-        .fixed-position.red {
-            background-color: #ff0000;
-        }
+        .fixed-position.red { background-color: #ff0000; }
+        .fixed-position.blue { background-color: #0000ff; }
+        .fixed-position.green { background-color: #00ff00; }
+        .fixed-position.yellow { background-color: #ffff00; color: black; }
 
         /* Instructions */
         .instructions {
@@ -97,22 +121,76 @@
             width: 100%;
             color: #555;
         }
+
+        /* Player bases */
+        .player-base {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border: 2px solid;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+        }
+
+        .base-red { background-color: #ffcccc; border-color: #ff6666; }
+        .base-blue { background-color: #ccccff; border-color: #6666ff; }
+        .base-green { background-color: #ccffcc; border-color: #66ff66; }
+        .base-yellow { background-color: #ffffcc; border-color: #ffff66; }
+
+        .base-cell {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
-    <div class="ludo-board" id="ludoBoard">
-        <!-- Board will be generated by JavaScript -->
-    </div>
+    <div class="ludo-container">
+        <!-- Player bases -->
+        <div class="player-base base-red" style="top: 10px; left: 10px;">
+            <div class="base-cell">R1</div>
+            <div class="base-cell">R2</div>
+            <div class="base-cell">R3</div>
+            <div class="base-cell">R4</div>
+        </div>
 
-    <div class="instructions">
-        <p>Scroll to randomize the red dot on positions 10-13</p>
+        <div class="player-base base-blue" style="top: 10px; right: 10px;">
+            <div class="base-cell">B1</div>
+            <div class="base-cell">B2</div>
+            <div class="base-cell">B3</div>
+            <div class="base-cell">B4</div>
+        </div>
+
+        <div class="player-base base-green" style="bottom: 10px; left: 10px;">
+            <div class="base-cell">G1</div>
+            <div class="base-cell">G2</div>
+            <div class="base-cell">G3</div>
+            <div class="base-cell">G4</div>
+        </div>
+
+        <div class="player-base base-yellow" style="bottom: 10px; right: 10px;">
+            <div class="base-cell">Y1</div>
+            <div class="base-cell">Y2</div>
+            <div class="base-cell">Y3</div>
+            <div class="base-cell">Y4</div>
+        </div>
+
+        <div class="board" id="board">
+            <!-- Board will be generated by JavaScript -->
+        </div>
+
+        <div class="instructions">
+            <p>Scroll to randomize the red dot on positions 10-13</p>
+        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const board = document.getElementById('ludoBoard');
+            const board = document.getElementById('board');
             const size = 15;
-            const cellSize = 500 / size;
+            const cellSize = 600 / size;
 
             // Create board cells
             for (let i = 0; i < size * size; i++) {
@@ -122,21 +200,29 @@
                 cell.style.height = `${cellSize}px`;
 
                 // Add center square
-                if (i >= 6*15 + 6 && i < 6*15 + 10 && i % 15 >= 6 && i % 15 < 10) {
+                if (i >= 6*15 + 6 && i < 6*15 + 9 && i % 15 >= 6 && i % 15 < 9) {
                     cell.classList.add('center');
                 }
 
-                // Add home paths
+                // Add path colors
                 if (i >= 0 && i < 5) cell.classList.add('red-path');
                 if (i >= 10 && i < 15) cell.classList.add('blue-path');
                 if (i >= 15*5 && i < 15*5 + 5) cell.classList.add('green-path');
                 if (i >= 15*10 && i < 15*10 + 5) cell.classList.add('yellow-path');
 
                 // Add start positions
-                if (i === 5) cell.classList.add('red-start');
-                if (i === 15*10 + 10) cell.classList.add('blue-start');
-                if (i === 15*14 + 5) cell.classList.add('green-start');
-                if (i === 15*5 + 10) cell.classList.add('yellow-start');
+                if (i === 5) cell.classList.add('start-red');
+                if (i === 15*10 + 10) cell.classList.add('start-blue');
+                if (i === 15*14 + 5) cell.classList.add('start-green');
+                if (i === 15*5 + 10) cell.classList.add('start-yellow');
+
+                // Add safe zones
+                if (i === 15*2 + 2 || i === 15*2 + 12 ||
+                    i === 15*12 + 2 || i === 15*12 + 12 ||
+                    i === 15*5 + 5 || i === 15*5 + 9 ||
+                    i === 15*9 + 5 || i === 15*9 + 9) {
+                    cell.classList.add('safe-zone');
+                }
 
                 board.appendChild(cell);
             }
@@ -149,6 +235,7 @@
                 const cell = board.children[pos];
                 const dot = document.createElement('div');
                 dot.className = 'fixed-position red';
+                dot.textContent = '●';
                 cell.appendChild(dot);
                 fixedDots.push(dot);
             });
